@@ -55,7 +55,7 @@ var locations = function(data) {
     this.desc = ko.observable(data.desc)
 }
 
-var ViewModel = function() {
+/*var ViewModel = function() {
     var self = this;
 
     this.locationList = ko.observableArray([]);
@@ -66,7 +66,7 @@ var ViewModel = function() {
 
 };
 
-ko.applyBindings(new ViewModel());
+ko.applyBindings(new ViewModel());*/
 
 
 
@@ -77,6 +77,7 @@ var center = new google.maps.LatLng(x,y);
 var map;
 var allLatlng = [];
 var allMarkers = [];
+var infowindow = null;
 
 function initialize() {
     var mapOptions = {
