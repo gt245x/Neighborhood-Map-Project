@@ -55,10 +55,28 @@ var locations = function(data) {
     this.desc = ko.observable(data.desc)
 }
 
+var ViewModel = function() {
+    var self = this;
+
+    this.locationList = ko.observableArray([]);
+
+    atlantaLocations.forEach(function(loc){
+        self.locationList.push(new locations(loc));
+    });
+
+};
+
+ko.applyBindings(new ViewModel());
+
+
+
+
 var x = 33.768933;
 var y = -84.420969;
 var center = new google.maps.LatLng(x,y);
 var map;
+var allLatlng = [];
+var allMarkers = [];
 
 function initialize() {
     var mapOptions = {
@@ -76,6 +94,36 @@ function initialize() {
     scaleControl: false
 };
 map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+for (var i = 0; i < atlantaLocations.length; i++) {
+        allMarkers= new google.maps.Marker({
+        position: atlantaLocations[i].location,
+        map : map,
+        title: atlantaLocations[i].name,
+        html :
+            '<div class="markerClass">' +
+            '<h1>' + atlantaLocations[i].name + '</h1>' +
+            '<h3>' + atlantaLocations[i].address + '</h3>' +
+            '<p>' + atlantaLocations[i].desc + '</p>'
+
+    });
+
+    // put all lat and lng in an array
+    allLatlng.push(atlantaLocations[i].location);
+
+};
+
+google.maps.event.addListener()(allMarkers, 'click', function() {
+    infowindow.setContent(this.html);
+    infowindow.open(map, this);
+});
+
+var bounds = new google.maps.LatLngBounds();
+for (var i = 0; i < allLatlng.length; i++ ) {
+    bounds.extend (allLatlng[i]);
+}
+map.fitBounds(bounds);
+
 };
 
 google.maps.event.addDomListener(window, 'load', initialize);
