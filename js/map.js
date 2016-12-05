@@ -94,6 +94,10 @@ function initialize() {
     },
     scaleControl: false
 };
+
+    infowindow = new google.maps.InfoWindow({
+        content: "holding..."
+    });
 map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
 for (var i = 0; i < atlantaLocations.length; i++) {
@@ -112,12 +116,14 @@ for (var i = 0; i < atlantaLocations.length; i++) {
     // put all lat and lng in an array
     allLatlng.push(atlantaLocations[i].location);
 
-};
-
-google.maps.event.addListener()(allMarkers, 'click', function() {
+google.maps.event.addListener(allMarkers, 'click', function() {
     infowindow.setContent(this.html);
     infowindow.open(map, this);
 });
+
+};
+
+
 
 var bounds = new google.maps.LatLngBounds();
 for (var i = 0; i < allLatlng.length; i++ ) {
