@@ -26,7 +26,7 @@ var atlantaLocations = [
         {
             location : {lat : 33.757168, lng : -84.396345},
             name : 'Philips Arena',
-            desc : "Philips Arena is a multi-purpose indooe arena located in Atlanta, Georgia that \
+            desc : "Philips Arena is a multi-purpose indoor arena located in Atlanta, Georgia that \
             is home to the Atlanta Hawks of the National Basketball Association and the Atlanta Dream, \
             of the Women's National Basketball  Assocation",
             address : '1 Philips Dr, Atlanta, GA 30303'
@@ -78,6 +78,10 @@ var map;
 var allLatlng = [];
 var allMarkers = [];
 var infowindow = null;
+var pos;
+var userCords;
+var walmartMarkers = [];
+var allWarmartlatlng = [];
 
 function initialize() {
     var mapOptions = {
@@ -134,3 +138,97 @@ map.fitBounds(bounds);
 };
 
 google.maps.event.addDomListener(window, 'load', initialize);
+
+
+$(function() {
+
+    if (navigator.geolocation) {
+        function error(err) {
+            console.warn('ERROR(' + err.code + '):' + err.message);
+        }
+        function success(pos) {
+            userCords = pos.coords;
+        }
+        navigator.geolocation.getCurrentPosition(success, error);
+    }
+    else {
+        alert('Geolocation is not supported in your browser');
+    }
+
+    function isValidUSZip(sZip) {
+   return /(^\d{5}$)|(^\d{5}-\d{4}$)/.test(sZip);
+    }
+
+    $('#chooseZip').submit(function() {
+        var userZip = $('#textZip').val();
+
+/*  if (isValidUSZip(userZip) == false) {
+        alert("Please provide a valid US zip")
+     }*/
+
+        var walmartURL;
+        if(userZip) {
+            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&zip=" + userZip +"&format=json"
+        } else {
+            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&lon=" + (userCords.longitude.toFixed(6))
+            + "&lat=" + (userCords.latitude.toFixed(6)) + "&format=json"
+        }
+
+
+        console.log(userCords.latitude + "," + userCords.longitude)
+        console.log(walmartURL)
+
+
+        $.ajax({
+            type: "GET",
+            url: walmartURL,
+            dataType: 'jsonp',
+
+            success:function(data) {
+                //console.log(data)
+                    for (var key in data) {
+                        var results = data[key];
+
+                        var long = results.coordinates[0];
+                        var lat = results.coordinates[1];
+                        walmartlatlng = new google.maps.LatLng(lat, long);
+
+                        walmartMarkers = new google.maps.Marker({
+                            position : walmartlatlng,
+                            map : map,
+                            title: results.name,
+                            html:
+                                '<div class="markerClass">' +
+                                '<h1>' + results.name + '</h1>' +
+                                '<h3>' + results.streetAddress + ', ' +  results.city + ', ' + results.stateProvCode + ' ' + results.zip + '</h3>' +
+                                '<br/>' + results.phoneNumber +
+                                '<p>' + 'OpenSundays: ' + results.sundayOpen + '</p>' +
+                                'Walmart id: ' + results.no +
+                                '</div>'
+
+                        });
+
+                        allWarmartlatlng.push(walmartlatlng);
+
+                    google.maps.event.addListener(walmartMarkers, 'click', function() {
+                        infowindow.setContent(this.html);
+                        infowindow.open(map, this);
+                    });
+
+                    };
+
+                    var bounds = new google.maps.LatLngBounds();
+                    for (var i = 0; i < allWarmartlatlng.length; i++ ) {
+                    bounds.extend (allWarmartlatlng[i]);
+                    }
+                    map.fitBounds(bounds);
+                }
+        });
+
+    return false;
+    });
+
+
+
+});
+
