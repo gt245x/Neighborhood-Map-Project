@@ -3,16 +3,34 @@
 <head>
     <title>Neigbhorhood map</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhMLqm1EqAaO6t1YC-ynp10rI__54qMxk"></script>
     <script type="text/javascript" src="js/lib/knockout-3.4.1.js"></script>
     <script type="text/javascript" src="js/map.js"></script>
+    <script type="text/javascript" src="js/search.js"></script>
 
 </head>
 <body>
 
+
+
+    <div id="control">
+        <h2>Find Walmart</h2>
+        <p>Udacity will help you locate the closest Walmart. Pick an option below</p>
+        <form method="get" id="chooseZip">
+            <button type="submit" class="learnButton">Use current location</button>
+            <button type="button" id="searchZip" class="learnButton">Search by Zip Code</button>
+            <div class="clear"></div>
+            <div class="zipSearch">
+                <input id="textZip" type="text" name="zip" placeholder="enter your zip code" autofocus>
+                <button type="submit" class="learnButton">Search</button>
+            </div>
+            <div class="clear"></div>
+        </form>
+    </div>
     <div id="map-canvas"></div>
 
 
