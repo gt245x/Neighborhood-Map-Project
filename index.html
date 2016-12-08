@@ -5,19 +5,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhMLqm1EqAaO6t1YC-ynp10rI__54qMxk"></script>
-    <script type="text/javascript" src="js/lib/knockout-3.4.1.js"></script>
-    <script type="text/javascript" src="js/map.js"></script>
-    <script type="text/javascript" src="js/search.js"></script>
 
 </head>
 <body>
 
-
+<!-- textInput: filterlocation -->
 
     <div id="control">
+        <div class="filter_ul">
+            <div class="filter">
+                Filter:<input type="text" data-bind="textInput: filteredlocation"/>
+            </div>
+            <ul data-bind="foreach: locationArray">
+                <li data-bind="text: name, click: $parent.clickedLocation" ></li>
+            </ul>
+
+        </div>
         <h2>Find Walmart</h2>
         <p>Udacity will help you locate the closest Walmart. Pick an option below</p>
         <form method="get" id="chooseZip">
@@ -33,6 +36,12 @@
     </div>
     <div id="map-canvas"></div>
 
+
+    <script src="js/lib/jquery-3.1.1.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhMLqm1EqAaO6t1YC-ynp10rI__54qMxk"></script>
+    <script type="text/javascript" src="js/lib/knockout-3.4.1.js"></script>
+    <script type="text/javascript" src="js/map.js"></script>
+    <script type="text/javascript" src="js/search.js"></script>
 
 </body>
 </html>
