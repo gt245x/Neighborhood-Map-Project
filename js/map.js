@@ -46,38 +46,73 @@ var atlantaLocations = [
             address : '61 North Avenue NW, Atlanta, GA 30308'
         }
 
-]
+];
+
+var filteredlocation = ko.observable("");
 
 var locations = function(data) {
+    var self = this;
     this.name = ko.observable(data.name);
     this.address = ko.observable(data.address);
     this.location = ko.observable(data.location);
     this.desc = ko.observable(data.desc)
+
+    this.location_typedin = ko.computed(function(){
+        if (filteredlocation().length > 0) {
+            return(self.name().toLowerCase().indexOf(filteredlocation().toLowerCase()) > -1);
+        }
+        else {
+            return true;
+        }
+    }, this);
+
+    this.toggleBounce = function() {
+    if (marker.getAnimation() !== null) {
+      marker.setAnimation(null);
+    } else {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+    }
+  };
 }
 
-/*var ViewModel = function() {
+var ViewModel = function() {
     var self = this;
 
+/*    this.filterlocation = ko.observable("");*/
     this.locationList = ko.observableArray([]);
 
     atlantaLocations.forEach(function(loc){
         self.locationList.push(new locations(loc));
     });
 
+    self.locationArray = ko.computed(function(){
+        var list = [];
+        this.locationList().forEach(function(loc){
+            if (loc.location_typedin())
+            {
+                list.push(loc);
+            }
+        });
+        return list;
+    }, this);
+
+
+    this.clickedLocation = function(loc) {
+        infowindow.setContent(loc.desc);
+        loc.toggleBounce();
+    };
+
 };
 
-ko.applyBindings(new ViewModel());*/
+ko.applyBindings(new ViewModel());
 
 
 
-
-var x = 33.768933;
-var y = -84.420969;
-var center = new google.maps.LatLng(x,y);
+var center = new google.maps.LatLng(33.768933,-84.420969);
 var map;
 var allLatlng = [];
 var allMarkers = [];
-var infowindow = null;
+var infowindow = new google.maps.InfoWindow();
 var pos;
 var userCords;
 var walmartMarkers = [];
@@ -99,9 +134,9 @@ function initialize() {
     scaleControl: false
 };
 
-    infowindow = new google.maps.InfoWindow({
+/*    infowindow = new google.maps.InfoWindow({
         content: "holding..."
-    });
+    });*/
 map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
 for (var i = 0; i < atlantaLocations.length; i++) {
@@ -116,7 +151,6 @@ for (var i = 0; i < atlantaLocations.length; i++) {
             '<p>' + atlantaLocations[i].desc + '</p>'
 
     });
-
     // put all lat and lng in an array
     allLatlng.push(atlantaLocations[i].location);
 
@@ -126,8 +160,6 @@ google.maps.event.addListener(allMarkers, 'click', function() {
 });
 
 };
-
-
 
 var bounds = new google.maps.LatLngBounds();
 for (var i = 0; i < allLatlng.length; i++ ) {
@@ -140,7 +172,9 @@ map.fitBounds(bounds);
 google.maps.event.addDomListener(window, 'load', initialize);
 
 
-$(function() {
+
+// comment out the 2nd part to work on the first part first
+/*$(function() {
 
     if (navigator.geolocation) {
         function error(err) {
@@ -162,9 +196,7 @@ $(function() {
     $('#chooseZip').submit(function() {
         var userZip = $('#textZip').val();
 
-/*  if (isValidUSZip(userZip) == false) {
-        alert("Please provide a valid US zip")
-     }*/
+  //if (isValidUSZip(userZip) == false) {alert("Please provide a valid US zip")}
 
         var walmartURL;
         if(userZip) {
@@ -232,3 +264,4 @@ $(function() {
 
 });
 
+*/
