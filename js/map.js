@@ -1,3 +1,14 @@
+var center = new google.maps.LatLng(33.768933,-84.420969);
+var map;
+var allLatlng = [];
+var markerlist = [];
+var infowindow = new google.maps.InfoWindow();
+var pos;
+var userCords;
+var walmartMarkers = [];
+var allWarmartlatlng = [];
+
+
 var atlantaLocations = [
         {
             location : {lat: 33.772620, lng : -84.385561},
@@ -50,12 +61,13 @@ var atlantaLocations = [
 
 var filteredlocation = ko.observable("");
 
-var locations = function(data) {
+var locations = function(data, index) {
     var self = this;
     this.name = ko.observable(data.name);
     this.address = ko.observable(data.address);
     this.location = ko.observable(data.location);
-    this.desc = ko.observable(data.desc)
+    this.desc = ko.observable(data.desc);
+    this.markerindex = ko.observable(index);
 
     this.location_typedin = ko.computed(function(){
         if (filteredlocation().length > 0) {
@@ -66,13 +78,7 @@ var locations = function(data) {
         }
     }, this);
 
-    this.toggleBounce = function() {
-    if (marker.getAnimation() !== null) {
-      marker.setAnimation(null);
-    } else {
-      marker.setAnimation(google.maps.Animation.BOUNCE);
-    }
-  };
+
 }
 
 var ViewModel = function() {
@@ -81,8 +87,8 @@ var ViewModel = function() {
 /*    this.filterlocation = ko.observable("");*/
     this.locationList = ko.observableArray([]);
 
-    atlantaLocations.forEach(function(loc){
-        self.locationList.push(new locations(loc));
+    atlantaLocations.forEach(function(loc, index){
+        self.locationList.push(new locations(loc, index));
     });
 
     self.locationArray = ko.computed(function(){
@@ -98,8 +104,8 @@ var ViewModel = function() {
 
 
     this.clickedLocation = function(loc) {
-        infowindow.setContent(loc.desc);
-        loc.toggleBounce();
+        var selected_marker = markerlist[loc.markerindex()];
+        toggleBounce(selected_marker);
     };
 
 };
@@ -108,15 +114,7 @@ ko.applyBindings(new ViewModel());
 
 
 
-var center = new google.maps.LatLng(33.768933,-84.420969);
-var map;
-var allLatlng = [];
-var allMarkers = [];
-var infowindow = new google.maps.InfoWindow();
-var pos;
-var userCords;
-var walmartMarkers = [];
-var allWarmartlatlng = [];
+
 
 function initialize() {
     var mapOptions = {
@@ -134,9 +132,6 @@ function initialize() {
     scaleControl: false
 };
 
-/*    infowindow = new google.maps.InfoWindow({
-        content: "holding..."
-    });*/
 map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
 for (var i = 0; i < atlantaLocations.length; i++) {
@@ -144,6 +139,7 @@ for (var i = 0; i < atlantaLocations.length; i++) {
         position: atlantaLocations[i].location,
         map : map,
         title: atlantaLocations[i].name,
+        animation: google.maps.Animation.DROP,
         html :
             '<div class="markerClass">' +
             '<h1>' + atlantaLocations[i].name + '</h1>' +
@@ -152,7 +148,10 @@ for (var i = 0; i < atlantaLocations.length; i++) {
 
     });
     // put all lat and lng in an array
+    markerlist.push(allMarkers)
     allLatlng.push(atlantaLocations[i].location);
+/*    console.log(markerlist[2])*/
+
 
 google.maps.event.addListener(allMarkers, 'click', function() {
     infowindow.setContent(this.html);
@@ -170,6 +169,14 @@ map.fitBounds(bounds);
 };
 
 google.maps.event.addDomListener(window, 'load', initialize);
+
+ function toggleBounce(marker) {
+    if (marker.getAnimation() !== null) {
+      marker.setAnimation(null);
+    } else {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+    }
+  };
 
 
 
