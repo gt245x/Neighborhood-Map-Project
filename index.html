@@ -17,7 +17,7 @@
                 Filter:<input type="text" data-bind="textInput: filteredlocation"/>
             </div>
             <ul data-bind="foreach: locationArray">
-                <li data-bind="text: name, click: $parent.clickedLocation" ></li>
+                <li class="filteredlocationlist" data-bind="text: name, click: $parent.clickedLocation" ></li>
             </ul>
 
         </div>
