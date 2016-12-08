@@ -57,6 +57,13 @@ var locations = function(data) {
     this.location = ko.observable(data.location);
     this.desc = ko.observable(data.desc)
 
+    this.marker = new google.maps.Marker ({
+        position : this.location(),
+        map: map,
+        title: this.name()
+    });
+
+
     this.location_typedin = ko.computed(function(){
         if (filteredlocation().length > 0) {
             return(self.name().toLowerCase().indexOf(filteredlocation().toLowerCase()) > -1);
@@ -78,7 +85,6 @@ var locations = function(data) {
 var ViewModel = function() {
     var self = this;
 
-/*    this.filterlocation = ko.observable("");*/
     this.locationList = ko.observableArray([]);
 
     atlantaLocations.forEach(function(loc){
@@ -96,9 +102,11 @@ var ViewModel = function() {
         return list;
     }, this);
 
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
     this.clickedLocation = function(loc) {
         infowindow.setContent(loc.desc);
+        infowindow.open(this.map, loc.marker);
         loc.toggleBounce();
     };
 
@@ -118,8 +126,7 @@ var userCords;
 var walmartMarkers = [];
 var allWarmartlatlng = [];
 
-function initialize() {
-    var mapOptions = {
+var mapOptions = {
     zoom : 8,
     center : center,
     panControl: true,
@@ -134,12 +141,10 @@ function initialize() {
     scaleControl: false
 };
 
-/*    infowindow = new google.maps.InfoWindow({
-        content: "holding..."
-    });*/
-map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+function initialize() {
 
 for (var i = 0; i < atlantaLocations.length; i++) {
+    // on line 148, i need to call the marker on line 60 instead of calling another 'new google maps.Marker' again
         allMarkers= new google.maps.Marker({
         position: atlantaLocations[i].location,
         map : map,
