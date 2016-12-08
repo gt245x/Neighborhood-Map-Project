@@ -2,7 +2,7 @@ var center = new google.maps.LatLng(33.768933,-84.420969);
 var map;
 var allLatlng = [];
 var markerlist = [];
-var infowindow = new google.maps.InfoWindow();
+var infowindow = new google.maps.InfoWindow({content: "holding...."});
 var pos;
 var userCords;
 var walmartMarkers = [];
@@ -105,14 +105,52 @@ var ViewModel = function() {
 
     this.clickedLocation = function(loc) {
         var selected_marker = markerlist[loc.markerindex()];
-        toggleBounce(selected_marker);
-    };
+        var index = loc.markerindex();
+        if (selected_marker) {
+            toggleBounce(selected_marker);
+        }
+        fillcontent(index);
+
+/*        console.log(loc.markerindex())
+        console.log(atlantaLocations[loc.markerindex()].name)
+        console.log(selected_marker)*/
+
 
 };
 
+};
+
+
 ko.applyBindings(new ViewModel());
 
+    function fillcontent(index, marker) {
+        selected_marker = marker;
+        var html =
+            '<div class="markerClass">' +
+            '<h1>' + atlantaLocations[index].name + '</h1>' +
+            '<h3>' + atlantaLocations[index].address + '</h3>' +
+            '<p>' + atlantaLocations[index].desc + '</p>'
+            infowindow.setContent(html);
+            infowindow.open(map, selected_marker);
+            }
 
+
+
+/*function fillinfo(marker, infowindow)  {
+    if (atlantaLocations.length > 0) {
+        html :
+            '<div class="markerClass">' +
+            '<h1>' + atlantaLocations[i].name + '</h1>' +
+            '<h3>' + atlantaLocations[i].address + '</h3>' +
+            '<p>' + atlantaLocations[i].desc + '</p>'
+        }
+    google.maps.event.addListener(allMarkers, 'click', function() {
+    infowindow.setContent(this.html);
+    infowindow.open(map, this);
+
+
+
+}*/
 
 
 
@@ -150,7 +188,7 @@ for (var i = 0; i < atlantaLocations.length; i++) {
     // put all lat and lng in an array
     markerlist.push(allMarkers)
     allLatlng.push(atlantaLocations[i].location);
-/*    console.log(markerlist[2])*/
+
 
 
 google.maps.event.addListener(allMarkers, 'click', function() {
