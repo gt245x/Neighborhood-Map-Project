@@ -7,6 +7,7 @@ var pos;
 var userCords;
 var walmartMarkers = [];
 var allWarmartlatlng = [];
+var filteredlocation = ko.observable("");
 
 
 var atlantaLocations = [
@@ -56,10 +57,9 @@ var atlantaLocations = [
             American classics',
             address : '61 North Avenue NW, Atlanta, GA 30308'
         }
-
 ];
 
-var filteredlocation = ko.observable("");
+
 
 var locations = function(data, index) {
     var self = this;
@@ -78,13 +78,11 @@ var locations = function(data, index) {
         }
     }, this);
 
-
 }
 
 var ViewModel = function() {
     var self = this;
 
-/*    this.filterlocation = ko.observable("");*/
     this.locationList = ko.observableArray([]);
 
     atlantaLocations.forEach(function(loc, index){
@@ -102,19 +100,12 @@ var ViewModel = function() {
         return list;
     }, this);
 
-
     this.clickedLocation = function(loc) {
         var selected_marker = markerlist[loc.markerindex()];
-        var index = loc.markerindex();
         if (selected_marker) {
             toggleBounce(selected_marker);
         }
-        fillcontent(index);
-
-/*        console.log(loc.markerindex())
-        console.log(atlantaLocations[loc.markerindex()].name)
-        console.log(selected_marker)*/
-
+        fillcontent(selected_marker);
 
 };
 
@@ -123,34 +114,6 @@ var ViewModel = function() {
 
 ko.applyBindings(new ViewModel());
 
-    function fillcontent(index, marker) {
-        selected_marker = marker;
-        var html =
-            '<div class="markerClass">' +
-            '<h1>' + atlantaLocations[index].name + '</h1>' +
-            '<h3>' + atlantaLocations[index].address + '</h3>' +
-            '<p>' + atlantaLocations[index].desc + '</p>'
-            infowindow.setContent(html);
-            infowindow.open(map, selected_marker);
-            }
-
-
-
-/*function fillinfo(marker, infowindow)  {
-    if (atlantaLocations.length > 0) {
-        html :
-            '<div class="markerClass">' +
-            '<h1>' + atlantaLocations[i].name + '</h1>' +
-            '<h3>' + atlantaLocations[i].address + '</h3>' +
-            '<p>' + atlantaLocations[i].desc + '</p>'
-        }
-    google.maps.event.addListener(allMarkers, 'click', function() {
-    infowindow.setContent(this.html);
-    infowindow.open(map, this);
-
-
-
-}*/
 
 
 
@@ -177,24 +140,18 @@ for (var i = 0; i < atlantaLocations.length; i++) {
         position: atlantaLocations[i].location,
         map : map,
         title: atlantaLocations[i].name,
+        address: atlantaLocations[i].address,
+        desc: atlantaLocations[i].desc,
         animation: google.maps.Animation.DROP,
-        html :
-            '<div class="markerClass">' +
-            '<h1>' + atlantaLocations[i].name + '</h1>' +
-            '<h3>' + atlantaLocations[i].address + '</h3>' +
-            '<p>' + atlantaLocations[i].desc + '</p>'
-
     });
     // put all lat and lng in an array
     markerlist.push(allMarkers)
     allLatlng.push(atlantaLocations[i].location);
 
-
-
-google.maps.event.addListener(allMarkers, 'click', function() {
-    infowindow.setContent(this.html);
-    infowindow.open(map, this);
-});
+    //fill content when clicked
+    allMarkers.addListener('click', function(){
+        fillcontent(this);
+    })
 
 };
 
@@ -213,8 +170,21 @@ google.maps.event.addDomListener(window, 'load', initialize);
       marker.setAnimation(null);
     } else {
       marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(function(){
+        marker.setAnimation(null);
+      }, 3000);
     }
   };
+
+function fillcontent(marker) {
+    var html =
+        '<div class="markerClass">' +
+        '<h1>' + marker.title + '</h1>' +
+        '<h3>' + marker.address + '</h3>' +
+        '<p>' + marker.desc + '</p>'
+        infowindow.setContent(html);
+        infowindow.open(map, marker);
+        }
 
 
 
