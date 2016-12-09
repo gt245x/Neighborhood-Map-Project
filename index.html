@@ -33,6 +33,16 @@
             </div>
             <div class="clear"></div>
         </form>
+
+        <div class="filter_ul">
+            <div class="filter">
+                Walmarts:<input type="text" data-bind="textInput: filteredwarmarts"/>
+            </div>
+            <ul data-bind="foreach: warmartArray">
+                <li class="filteredwarmarts" data-bind="text: title, click: " ></li>
+            </ul>
+
+        </div>
     </div>
     <div id="map-canvas"></div>
 
