@@ -178,6 +178,8 @@ var ViewModel = function() {
 
 /////////////////////////////////////////////////////
 self.zipCode = ko.observable('');
+console.log(self.zipCode())
+
 
 ////////////
 //Run navigate function to get users location.
@@ -186,8 +188,8 @@ navigate()
 // When submit button is clicked, run the ajax asyn
 self.getLocations =function() {
 
-
-  if (isValidUSZip(self.zipCode()) == false) {alert("Please provide a valid US zip"); return }
+    //validate users zip code entry
+  if ((isValidUSZip(self.zipCode()) == false)&&(self.zipCode() != '')) {alert("Please provide a valid US zip"); return }
 
         var walmartURL;
         if(self.zipCode()) {
@@ -197,12 +199,13 @@ self.getLocations =function() {
             + "&lat=" + (userCords.latitude.toFixed(6)) + "&format=json"
         }
 
+
         $.ajax({
             type: "GET",
             url: walmartURL,
             dataType: 'jsonp',
-
-            success:function(data) {
+            timeout: 1000
+            }).done(function(data) {
                 //console.log(data)
                     for (var key in data) {
                         var results = data[key];
@@ -248,8 +251,10 @@ self.getLocations =function() {
                     bounds.extend (allWarmartlatlng[i]);
                     }
                     map.fitBounds(bounds);
-                }
-        });
+                }).fail(function(){
+                    alert('Walmart cannot provide any information at the moment')
+                });
+
 
 
     return false;
