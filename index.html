@@ -23,12 +23,12 @@
         </div>
         <h2>Find Walmart</h2>
         <p>Udacity will help you locate the closest Walmart. Pick an option below</p>
-        <form method="get" id="chooseZip">
+        <form id="chooseZip" data-bind="submit: getLocations">
             <button type="submit" class="learnButton">Use current location</button>
             <button type="button" id="searchZip" class="learnButton">Search by Zip Code</button>
             <div class="clear"></div>
             <div class="zipSearch">
-                <input id="textZip" type="text" name="zip" placeholder="enter your zip code" autofocus>
+                <input id="textZip" type="text" name="zip" placeholder="enter your zip code" data-bind="value: zipCode" autofocus>
                 <button type="submit" class="learnButton">Search</button>
             </div>
             <div class="clear"></div>
@@ -39,7 +39,7 @@
                 Walmarts:<input type="text" data-bind="textInput: filteredwarmarts"/>
             </div>
             <ul data-bind="foreach: warmartArray">
-                <li class="filteredwarmarts" data-bind="text: title, click: " ></li>
+                <li class="filteredlocationlist" data-bind="text: title, click: $parent.walmartclickedLocation" ></li>
             </ul>
 
         </div>
