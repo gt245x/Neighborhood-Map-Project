@@ -67,13 +67,13 @@ var atlantaLocations = [
 
 var locations = function(data, index) {
     var self = this;
-    this.name = ko.observable(data.name);
-    this.address = ko.observable(data.address);
-    this.location = ko.observable(data.location);
-    this.desc = ko.observable(data.desc);
+    this.name = data.name;
+    this.address = data.address;
+    this.location = data.location;
+    this.desc = data.desc;
     this.markerindex = ko.observable(index);
 
-    this.location_typedin = ko.computed(function(){
+    this.location_available = ko.computed(function(){
         if (filteredlocation().length > 0) {
             return(self.name().toLowerCase().indexOf(filteredlocation().toLowerCase()) > -1);
         }
@@ -96,9 +96,9 @@ var walmartdata = function(data) {
     this.openSundays=ko.observable(data.openSundays);
     this.id = ko.observable(data.id);
 
-    this.warmartlocation_typedin = ko.computed(function(){
+    this.warmartlocation_available = ko.computed(function(){
     if (filteredwarmarts().length > 0) {
-        return(self.name().toLowerCase().indexOf(filteredwarmarts().toLowerCase()) > -1);
+        return(self.title().toLowerCase().indexOf(filteredwarmarts().toLowerCase()) > -1);
     }
     else {
         return true;
@@ -119,7 +119,7 @@ var ViewModel = function() {
     self.locationArray = ko.computed(function(){
         var list = [];
         this.locationList().forEach(function(loc){
-            if (loc.location_typedin())
+            if (loc.location_available())
             {
                 list.push(loc);
             }
@@ -133,24 +133,128 @@ var ViewModel = function() {
             toggleBounce(selected_marker);
         }
         fillcontent(selected_marker);
+        console.log(loc.markerindex())
 };
+
+    this.walmartclickedLocation = function(loc) {
+        var id_number = loc.id();
+        var counter = 0
+        var walmartmarker = 0;
+
+        //Get counter of the walmart that was clicked
+        for (var i = 0; i < walmartMarkerslist.length; i++) {
+            if (walmartMarkerslist[i].id == id_number) {
+                walmartmarker = counter;
+            }
+        else{
+            counter++;
+        }
+    }
+        var selected_walmartmarker = walmartMarkerslist[walmartmarker];
+        if (selected_walmartmarker) {
+            toggleBounce(selected_walmartmarker);
+        }
+        walmartcontent(selected_walmartmarker);
+};
+
+
+
 ///////////Data for Walmart//////
     this.walmartlist = ko.observableArray([]);
 
-    walmartMarkerslist.forEach(function(loc){
-        self.walmartlist.push(new walmartdata(loc));
-    });
+
 
     self.warmartArray = ko.computed(function(){
     var list2 = [];
     this.walmartlist().forEach(function(loc){
-        if (loc.warmartlocation_typedin())
+        if (loc.warmartlocation_available())
         {
             list2.push(loc);
         }
     });
     return list2;
 }, this);
+
+
+/////////////////////////////////////////////////////
+self.zipCode = ko.observable('');
+
+////////////
+//Run navigate function to get users location.
+navigate()
+
+// When submit button is clicked, run the ajax asyn
+self.getLocations =function() {
+
+
+  if (isValidUSZip(self.zipCode()) == false) {alert("Please provide a valid US zip"); return }
+
+        var walmartURL;
+        if(self.zipCode()) {
+            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&zip=" + self.zipCode() +"&format=json"
+        } else {
+            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&lon=" + (userCords.longitude.toFixed(6))
+            + "&lat=" + (userCords.latitude.toFixed(6)) + "&format=json"
+        }
+
+        $.ajax({
+            type: "GET",
+            url: walmartURL,
+            dataType: 'jsonp',
+
+            success:function(data) {
+                //console.log(data)
+                    for (var key in data) {
+                        var results = data[key];
+
+                        var long = results.coordinates[0];
+                        var lat = results.coordinates[1];
+                        walmartlatlng = new google.maps.LatLng(lat, long);
+
+                        walmartMarkers = new google.maps.Marker({
+                            position : walmartlatlng,
+                            map : map,
+                            title: results.name,
+                            address : results.streetAddress,
+                            city : results.city,
+                            state: results.stateProvCode,
+                            zip: results.zip,
+                            phone: results.phoneNumber,
+                            openSundays : results.sundayOpen,
+                            id : results.no
+                        });
+
+                        // put all lat and lng in an array
+                        allWarmartlatlng.push(walmartlatlng);
+                        // put all walmart markers into an array
+                        walmartMarkerslist.push(walmartMarkers)
+
+                        //fill content when clicked
+                        walmartMarkers.addListener('click', function(){
+                        walmartcontent(this);
+                        })
+
+                    };
+                    //console.log(walmartMarkerslist[0])
+                        walmartMarkerslist.forEach(function(loc){
+                        self.walmartlist.push(new walmartdata(loc));
+                    });
+
+
+
+
+                    var bounds = new google.maps.LatLngBounds();
+                    for (var i = 0; i < allWarmartlatlng.length; i++ ) {
+                    bounds.extend (allWarmartlatlng[i]);
+                    }
+                    map.fitBounds(bounds);
+                }
+        });
+
+
+    return false;
+    };
+
 
 };
 
@@ -241,14 +345,13 @@ function walmartcontent(marker) {
     infowindow.setContent(html);
     infowindow.open(map, marker);
 
-
 }
 
+function isValidUSZip(sZip) {
+   return /(^\d{5}$)|(^\d{5}-\d{4}$)/.test(sZip);
+ }
 
-
-// Section 2 : Warmart
-
-$(function() {
+function navigate() {
     if (navigator.geolocation) {
         function error(err) {
             console.warn('ERROR(' + err.code + '):' + err.message);
@@ -261,82 +364,5 @@ $(function() {
     else {
         alert('Geolocation is not supported in your browser');
     }
-
-    function isValidUSZip(sZip) {
-   return /(^\d{5}$)|(^\d{5}-\d{4}$)/.test(sZip);
-    }
-
-    $('#chooseZip').submit(function() {
-        var userZip = $('#textZip').val();
-
-  //if (isValidUSZip(userZip) == false) {alert("Please provide a valid US zip")}
-
-        var walmartURL;
-        if(userZip) {
-            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&zip=" + userZip +"&format=json"
-        } else {
-            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&lon=" + (userCords.longitude.toFixed(6))
-            + "&lat=" + (userCords.latitude.toFixed(6)) + "&format=json"
-        }
-
-//        console.log(userCords.latitude + "," + userCords.longitude)
- //       console.log(walmartURL)
-
-
-        $.ajax({
-            type: "GET",
-            url: walmartURL,
-            dataType: 'jsonp',
-
-            success:function(data) {
-                //console.log(data)
-                    for (var key in data) {
-                        var results = data[key];
-
-                        var long = results.coordinates[0];
-                        var lat = results.coordinates[1];
-                        walmartlatlng = new google.maps.LatLng(lat, long);
-
-                        walmartMarkers = new google.maps.Marker({
-                            position : walmartlatlng,
-                            map : map,
-                            title: results.name,
-                            address : results.streetAddress,
-                            city : results.city,
-                            state: results.stateProvCode,
-                            zip: results.zip,
-                            phone: results.phoneNumber,
-                            openSundays : results.sundayOpen,
-                            id : results.no
-                        });
-
-                        // put all lat and lng in an array
-                        allWarmartlatlng.push(walmartlatlng);
-                        // put all walmart markers into an array
-                        walmartMarkerslist.push(walmartMarkers)
-
-                        //fill content when clicked
-                        walmartMarkers.addListener('click', function(){
-                        walmartcontent(this);
-                        })
-
-
-                    };
-                    console.log(walmartMarkerslist[0])
-
-
-                    var bounds = new google.maps.LatLngBounds();
-                    for (var i = 0; i < allWarmartlatlng.length; i++ ) {
-                    bounds.extend (allWarmartlatlng[i]);
-                    }
-                    map.fitBounds(bounds);
-                }
-        });
-
-    return false;
-    });
-
-
-
-});
+};
 
