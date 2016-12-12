@@ -9,65 +9,62 @@ var walmartMarkerslist = [];
 var allWarmartlatlng = [];
 var filteredlocation = ko.observable("");
 var filteredwarmarts = ko.observable("");
+var menu = ko.observable("open");
 
 
 
 var atlantaLocations = [
         {
             location : {lat: 33.772620, lng : -84.385561},
-            name : 'The Fox theatre',
-            desc : 'A former movie palace, is a performing arts venue located in Midtown Atlanta, \
-                    Georgia and is the centerpiece of the Fox Theatre Historic District',
-            address : '600 Peachtree Street NE, Atlanta, GA 30308'
+            name : "The Fox theatre",
+            desc : "A former movie palace, is a performing arts venue located in Midtown Atlanta, \
+                    Georgia and is the centerpiece of the Fox Theatre Historic District",
+            address : "600 Peachtree Street NE, Atlanta, GA 30308"
 
         },
         {
             location : {lat : 33.762742, lng : -84.392664},
-            name : 'World of Coca-Cola',
-            desc : 'The world of Coca-Cola is a museum showcasing the history of The Coca-Cola company \
+            name : "World of Coca-Cola",
+            desc : "The world of Coca-Cola is a museum showcasing the history of The Coca-Cola company \
             that contains a host of entertainment areas and attractions, and is located in Atlanta, \
-            Georgia at Pemberton Place',
-            address : '121 Baker St NW, Atlanta, GA 30313'
+            Georgia at Pemberton Place",
+            address : "121 Baker St NW, Atlanta, GA 30313"
         },
         {
             location : {lat : 33.763424, lng : -84.394891},
-            name : 'Georgia Aquarium',
-            desc : 'The Georgia Aquarium is a public aquarium in Atlanta, Georgia. It is the largest \
+            name : "Georgia Aquarium",
+            desc : "The Georgia Aquarium is a public aquarium in Atlanta, Georgia. It is the largest \
             aquarium in the Western Hemisphere, housing thousands of animals and representing several \
-            thousand species.',
-            address : '225 Baker St NW, Atlanta, GA 30313'
+            thousand species.",
+            address : "225 Baker St NW, Atlanta, GA 30313"
         },
         {
             location : {lat : 33.757168, lng : -84.396345},
-            name : 'Philips Arena',
+            name : "Philips Arena",
             desc : "Philips Arena is a multi-purpose indoor arena located in Atlanta, Georgia that \
             is home to the Atlanta Hawks of the National Basketball Association and the Atlanta Dream, \
             of the Women's National Basketball  Assocation",
-            address : '1 Philips Dr, Atlanta, GA 30303'
+            address : "1 Philips Dr, Atlanta, GA 30303"
         },
         {
             location : {lat : 33.732162, lng : -84.371335},
-            name : 'Zoo Atlanta',
-            desc : 'Zoo Atlanta is an Association of Zoos and Aquariums accredited zoological park \
-            in Atlanta, Georgia. The zoo is one of four zoos in the U.S currently housing giant pandas.',
-            address : '800 Cherokee Ave SE, Atlanta, GA 30315'
+            name : "Zoo Atlanta",
+            desc : "Zoo Atlanta is an Association of Zoos and Aquariums accredited zoological park \
+            in Atlanta, Georgia. The zoo is one of four zoos in the U.S currently housing giant pandas.",
+            address : "800 Cherokee Ave SE, Atlanta, GA 30315"
         },
         {
             location : {lat : 33.771510, lng : -84.389311},
-            name : 'The Varsity',
-            desc: 'Long-running drive-in chain serving up burgers, hot dogs, fries, shakes & other \
-            American classics',
-            address : '61 North Avenue NW, Atlanta, GA 30308'
+            name : "The Varsity",
+            desc: "Long-running drive-in chain serving up burgers, hot dogs, fries, shakes & other \
+            American classics",
+            address : "61 North Avenue NW, Atlanta, GA 30308"
         }
 ];
 
-
-
-
-
 var locations = function(data, index) {
     var self = this;
-    this.name = data.name;
+    this.name = ko.observable(data.name);
     this.address = data.address;
     this.location = data.location;
     this.desc = data.desc;
@@ -108,6 +105,11 @@ var walmartdata = function(data) {
 
 
 var ViewModel = function() {
+    //Run initialize function to get the map and dsplay specified locations
+    initialize()
+
+
+    //Create a location list for the listed locations
     var self = this;
 
     this.locationList = ko.observableArray([]);
@@ -127,6 +129,7 @@ var ViewModel = function() {
         return list;
     }, this);
 
+    //Function to handle when users clicks on filterd location. Data-bind on click for the filtered location
     this.clickedLocation = function(loc) {
         var selected_marker = markerlist[loc.markerindex()];
         if (selected_marker) {
@@ -136,6 +139,7 @@ var ViewModel = function() {
         console.log(loc.markerindex())
 };
 
+    //Function to handle when users clicks on filterd walmart location.
     this.walmartclickedLocation = function(loc) {
         var id_number = loc.id();
         var counter = 0
@@ -157,13 +161,25 @@ var ViewModel = function() {
         walmartcontent(selected_walmartmarker);
 };
 
+    //function to open and close thumbnail nav
+    this.openMenu = function() {
+            if (menu()=="open") {
+                document.getElementById("nav").style.webkitTransform = "translate(-100%,0)";
+                document.getElementById("nav").style.position = "absolute";
+                menu("close")
+            }
+            else
+            {
+                document.getElementById("nav").style.webkitTransform = "translate(0,0)";
+                document.getElementById("nav").style.position = "relative";
+                menu ("open");
+            }
+        };
 
-
-///////////Data for Walmart//////
+    //Data for Walmart
     this.walmartlist = ko.observableArray([]);
 
-
-
+    //Function to help filter out walmart locations
     self.warmartArray = ko.computed(function(){
     var list2 = [];
     this.walmartlist().forEach(function(loc){
@@ -175,13 +191,9 @@ var ViewModel = function() {
     return list2;
 }, this);
 
-
-/////////////////////////////////////////////////////
+//Make zipCode to be ko.observable.
 self.zipCode = ko.observable('');
-console.log(self.zipCode())
 
-
-////////////
 //Run navigate function to get users location.
 navigate()
 
@@ -189,16 +201,18 @@ navigate()
 self.getLocations =function() {
 
     //validate users zip code entry
-  if ((isValidUSZip(self.zipCode()) == false)&&(self.zipCode() != '')) {alert("Please provide a valid US zip"); return }
+  if ((isValidUSZip(self.zipCode()) == false)&&(self.zipCode() != ''))
+         {alert("Please provide a valid US zip"); return }
 
         var walmartURL;
         if(self.zipCode()) {
-            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&zip=" + self.zipCode() +"&format=json"
+            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&zip=" +
+            self.zipCode() +"&format=json"
         } else {
-            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&lon=" + (userCords.longitude.toFixed(6))
-            + "&lat=" + (userCords.latitude.toFixed(6)) + "&format=json"
+            walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&lon=" +
+            (userCords.longitude.toFixed(6)) + "&lat=" +
+            (userCords.latitude.toFixed(6)) + "&format=json"
         }
-
 
         $.ajax({
             type: "GET",
@@ -243,9 +257,6 @@ self.getLocations =function() {
                         self.walmartlist.push(new walmartdata(loc));
                     });
 
-
-
-
                     var bounds = new google.maps.LatLngBounds();
                     for (var i = 0; i < allWarmartlatlng.length; i++ ) {
                     bounds.extend (allWarmartlatlng[i]);
@@ -254,25 +265,23 @@ self.getLocations =function() {
                 }).fail(function(){
                     alert('Walmart cannot provide any information at the moment')
                 });
-
-
-
     return false;
     };
-
-
 };
-
 
 ko.applyBindings(new ViewModel());
 
 
-
-
 function initialize() {
+    //creates a map object and specfies the DOM element for display.
     var mapOptions = {
     zoom : 8,
     center : center,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        position : google.maps.ControlPosition.RIGHT_TOP
+            },
     panControl: true,
     panControlOptions: {
         position: google.maps.ControlPosition.BOTTOM_LEFT
@@ -287,6 +296,7 @@ function initialize() {
 
 map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
+// for loop to loop all over the location
 for (var i = 0; i < atlantaLocations.length; i++) {
         allMarkers= new google.maps.Marker({
         position: atlantaLocations[i].location,
@@ -312,12 +322,11 @@ for (var i = 0; i < allLatlng.length; i++ ) {
     bounds.extend (allLatlng[i]);
 }
 map.fitBounds(bounds);
-
 };
 
-google.maps.event.addDomListener(window, 'load', initialize);
 
- function toggleBounce(marker) {
+//Function to toggle each location when clicked
+function toggleBounce(marker) {
     if (marker.getAnimation() !== null) {
       marker.setAnimation(null);
     } else {
@@ -328,6 +337,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
     }
   };
 
+//Function to fill the selected location marker with HTML content.
 function fillcontent(marker) {
     var html =
         '<div class="markerClass">' +
@@ -338,6 +348,7 @@ function fillcontent(marker) {
         infowindow.open(map, marker);
         }
 
+//Function to fill the selected walmart location marker with HTML content.
 function walmartcontent(marker) {
     var html =
     '<div class="markerClass">' +
@@ -352,10 +363,12 @@ function walmartcontent(marker) {
 
 }
 
+//Function to check on zipcode validity.
 function isValidUSZip(sZip) {
    return /(^\d{5}$)|(^\d{5}-\d{4}$)/.test(sZip);
  }
 
+//Function to get users current location.
 function navigate() {
     if (navigator.geolocation) {
         function error(err) {
@@ -370,4 +383,9 @@ function navigate() {
         alert('Geolocation is not supported in your browser');
     }
 };
+
+//Function to alert user on error loading google map.
+function googleMapError() {
+    alert("Google map failed to display!!!")
+}
 
