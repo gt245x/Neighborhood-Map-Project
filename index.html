@@ -3,17 +3,18 @@
 <head>
     <title>Neigbhorhood map</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-
+    <link rel="stylesheet" type="text/css" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
 
-<!-- textInput: filterlocation -->
-
-    <div id="control">
-        <div class="filter_ul">
-            <div class="filter">
+<!--     <span class="nav-toggle">&#9776;</span> -->
+    <i class="fa fa-bars fa-2x nav-toggle" data-bind="click: openMenu">menu</i>
+    <nav id="nav" class="nav">
+            <div class="filter_ul">
+            <div class="filter"><br>
                 Filter:<input type="text" data-bind="textInput: filteredlocation"/>
             </div>
             <ul data-bind="foreach: locationArray">
@@ -24,12 +25,12 @@
         <h2>Find Walmart</h2>
         <p>Udacity will help you locate the closest Walmart. Pick an option below</p>
         <form id="chooseZip" data-bind="submit: getLocations">
-            <button type="submit" class="learnButton">Use current location</button>
-            <button type="button" id="searchZip" class="learnButton">Search by Zip Code</button>
+            <button type="submit" class="locationButton">Use current location</button>
+            <button type="button" id="searchZip" class="locationButton">Search by Zip Code</button>
             <div class="clear"></div>
             <div class="zipSearch">
                 <input id="textZip" type="text" name="zip" placeholder="enter your zip code" data-bind="value: zipCode" autofocus>
-                <button type="submit" class="learnButton">Search</button>
+                <button type="submit" class="locationButton">Search</button>
             </div>
             <div class="clear"></div>
         </form>
@@ -43,8 +44,9 @@
             </ul>
 
         </div>
-    </div>
-    <div id="map-canvas"></div>
+    </nav>
+
+    <div id="map-canvas" class="map-canvas"></div>
 
 
     <script src="js/lib/jquery-3.1.1.min.js"></script>
@@ -53,5 +55,7 @@
     <script type="text/javascript" src="js/map.js"></script>
     <script type="text/javascript" src="js/search.js"></script>
 
+
 </body>
 </html>
+
