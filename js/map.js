@@ -368,6 +368,7 @@ function isValidUSZip(sZip) {
 function navigate() {
     if (navigator.geolocation) {
         function error(err) {
+            //alert('ERROR(' + err.code + '):' + err.message);
             console.warn('ERROR(' + err.code + '):' + err.message);
         }
         function success(pos) {
