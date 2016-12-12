@@ -1,8 +1,7 @@
-var center = new google.maps.LatLng(33.768933,-84.420969);
 var map;
 var allLatlng = [];
 var markerlist = [];
-var infowindow = new google.maps.InfoWindow({content: "holding...."});
+var infowindow;
 var pos;
 var userCords;
 var walmartMarkerslist = [];
@@ -11,8 +10,7 @@ var filteredlocation = ko.observable("");
 var filteredwarmarts = ko.observable("");
 var menu = ko.observable("open");
 
-
-
+//Locations that will be displayed once the index file is loaded.
 var atlantaLocations = [
         {
             location : {lat: 33.772620, lng : -84.385561},
@@ -103,15 +101,11 @@ var walmartdata = function(data) {
 }, this);
 }
 
-
 var ViewModel = function() {
-    //Run initialize function to get the map and dsplay specified locations
-    initialize()
 
-
-    //Create a location list for the listed locations
     var self = this;
 
+    //Create location list to be an observable array.
     this.locationList = ko.observableArray([]);
 
     atlantaLocations.forEach(function(loc, index){
@@ -274,6 +268,7 @@ ko.applyBindings(new ViewModel());
 
 function initialize() {
     //creates a map object and specfies the DOM element for display.
+    var center = new google.maps.LatLng(33.768933,-84.420969);
     var mapOptions = {
     zoom : 8,
     center : center,
@@ -295,6 +290,7 @@ function initialize() {
 };
 
 map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+infowindow = new google.maps.InfoWindow({content: "holding...."});
 
 // for loop to loop all over the location
 for (var i = 0; i < atlantaLocations.length; i++) {
@@ -388,4 +384,3 @@ function navigate() {
 function googleMapError() {
     alert("Google map failed to display!!!")
 }
-
