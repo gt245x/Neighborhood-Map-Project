@@ -9,5 +9,7 @@ Installation:
 	Run the index.html file using local host or by opening using any browser.
 
 Credit:
-	Special thanks to Paul Dessert for the youTube video Google maps api tutorial on finding local farmers market
+	Special thanks to Paul Dessert for the youTube video Google maps api tutorial on finding local farmers market. The 4 part video 
+	tutorial provided guidance in implementing my own code.
+
 
