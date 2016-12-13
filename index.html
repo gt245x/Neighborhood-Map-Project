@@ -15,9 +15,9 @@
     <nav id="nav" class="nav">
             <div class="filter_ul">
             <div class="filter"><br>
-                Filter:<input type="text" data-bind="textInput: filteredlocation"/>
+                Filter:<input type="text" data-bind="textInput: filterTerm, valueUpdate: 'afterkeydown'"/>
             </div>
-            <ul data-bind="foreach: locationArray">
+            <ul data-bind="foreach: filteredList">
                 <li class="filteredlocationlist" data-bind="text: name, click: $parent.clickedLocation" ></li>
             </ul>
 
@@ -37,9 +37,9 @@
 
         <div class="filter_ul">
             <div class="filter">
-                Walmarts:<input type="text" data-bind="textInput: filteredwarmarts"/>
+                Walmarts:<input type="text" data-bind="textInput: walmartFilterTerm, valueUpdate: 'afterkeydown'"/>
             </div>
-            <ul data-bind="foreach: warmartArray">
+            <ul data-bind="foreach: filteredWarmartList">
                 <li class="filteredlocationlist" data-bind="text: title, click: $parent.walmartclickedLocation" ></li>
             </ul>
 
