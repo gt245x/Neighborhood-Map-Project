@@ -6,8 +6,8 @@ var pos;
 var userCords;
 var walmartMarkerslist = [];
 var allWarmartlatlng = [];
-var filteredlocation = ko.observable("");
-var filteredwarmarts = ko.observable("");
+//var filteredlocation = ko.observable("");
+//var filteredwarmarts = ko.observable("");
 var menu = ko.observable("open");
 
 //Locations that will be displayed once the index file is loaded.
@@ -62,20 +62,12 @@ var atlantaLocations = [
 
 var locations = function(data, index) {
     var self = this;
-    this.name = ko.observable(data.name);
+    this.name = data.name;
     this.address = data.address;
     this.location = data.location;
     this.desc = data.desc;
     this.markerindex = ko.observable(index);
 
-    this.location_available = ko.computed(function(){
-        if (filteredlocation().length > 0) {
-            return(self.name().toLowerCase().indexOf(filteredlocation().toLowerCase()) > -1);
-        }
-        else {
-            return true;
-        }
-    }, this);
 
 }
 
@@ -91,14 +83,6 @@ var walmartdata = function(data) {
     this.openSundays=ko.observable(data.openSundays);
     this.id = ko.observable(data.id);
 
-    this.warmartlocation_available = ko.computed(function(){
-    if (filteredwarmarts().length > 0) {
-        return(self.title().toLowerCase().indexOf(filteredwarmarts().toLowerCase()) > -1);
-    }
-    else {
-        return true;
-    }
-}, this);
 }
 
 var ViewModel = function() {
@@ -112,16 +96,31 @@ var ViewModel = function() {
         self.locationList.push(new locations(loc, index));
     });
 
-    self.locationArray = ko.computed(function(){
-        var list = [];
-        this.locationList().forEach(function(loc){
-            if (loc.location_available())
-            {
-                list.push(loc);
+    //Filter list
+    this.filterTerm = ko.observable("");
+
+    self.filteredList = ko.computed(function(){
+        if (!self.filterTerm()) {
+            return self.locationList();
+        }else {
+        return ko.utils.arrayFilter(self.locationList(), function(loc){
+            return loc.name.toLowerCase().indexOf(self.filterTerm().toLowerCase()) >=0;
+            });
+        };
+    });
+
+    //Filter markers (Need to figure out how to locate the markers)
+    self.filtermarkers = ko.computed(function() {
+        return ko.utils.arrayFilter(self.locationList(), function(loc){
+            if (loc.name.toLowerCase().indexOf(self.filterTerm().toLowerCase()) >= 0) {
+                console.log("test")
+                //loc.allMarkers.setVisible(false)
+            }else  {
+                console.log("game")
             }
-        });
-        return list;
-    }, this);
+        })
+    })
+
 
     //Function to handle when users clicks on filterd location. Data-bind on click for the filtered location
     this.clickedLocation = function(loc) {
@@ -172,18 +171,20 @@ var ViewModel = function() {
 
     //Data for Walmart
     this.walmartlist = ko.observableArray([]);
+    this.walmartFilterTerm = ko.observable("");
 
     //Function to help filter out walmart locations
-    self.warmartArray = ko.computed(function(){
-    var list2 = [];
-    this.walmartlist().forEach(function(loc){
-        if (loc.warmartlocation_available())
-        {
-            list2.push(loc);
-        }
+
+    //Filter list
+    self.filteredWarmartList = ko.computed(function(){
+        if (!self.walmartFilterTerm()) {
+            return self.walmartlist();
+        }else {
+        return ko.utils.arrayFilter(self.walmartlist(), function(loca){
+            return loca.name.toLowerCase().indexOf(self.walmartFilterTerm().toLowerCase()) >=0;
+            });
+        };
     });
-    return list2;
-}, this);
 
 //Make zipCode to be ko.observable.
 self.zipCode = ko.observable('');
@@ -263,7 +264,7 @@ self.getLocations =function() {
     };
 };
 
-ko.applyBindings(new ViewModel());
+
 
 
 function initialize() {
@@ -318,6 +319,8 @@ for (var i = 0; i < allLatlng.length; i++ ) {
     bounds.extend (allLatlng[i]);
 }
 map.fitBounds(bounds);
+
+ko.applyBindings(new ViewModel());
 };
 
 
