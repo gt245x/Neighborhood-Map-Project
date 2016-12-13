@@ -106,18 +106,41 @@ var ViewModel = function() {
         };
     }.bind(this));
 
+//this.setVisibilityForAll(true)
+    this.setVisibilityForAll = function(markerList, visible){
+        markerList.forEach(function(marker){
+            marker.setVisible(visible);
+        });
+    };
+
+    this.setVisibilityForSome = function(markerList, myMarkerList, visible){
+        markerList.forEach(function(marker){
+            myMarkerList.forEach(function(myMarker){
+                if(myMarker.name == marker.name){
+                    marker.setVisible(visible);
+                }
+            });
+        });
+    };
 
     //Filter markers (Need to figure out how to locate the markers)
     this.filtermarkers = ko.computed(function() {
-        return ko.utils.arrayFilter(this.locationList(), function(loc){
-            if (loc.name.toLowerCase().indexOf(this.filterTerm().toLowerCase()) >= 0) {
-                //console.log("test")
-                //loc.allMarkers.setVisible(false)
-            }else  {
-                //loc.allMarkers.setVisible(true)
-            }
-        }.bind(this));
+         var filterTermValue = this.filterTerm().toLowerCase().trim();
+         var myLocationList = this.locationList();
+         if(filterTermValue.length == 0){
+            this.setVisibilityForAll(myLocationList,true);
+            return myLocationList;
+         }
+         else{
+            var filteredLocationList = ko.utils.arrayFilter(myLocationList,
+             function(location){
+                return location.name.toLowerCase().indexOf(filterTermValue);
+             });
+             return filteredLocationList;
+         }
     }.bind(this));
+
+
 
 
     //Function to handle when users clicks on filterd location. Data-bind on click for the filtered location
@@ -287,6 +310,7 @@ function initialize() {
     },
     scaleControl: false
 };
+
 
 map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 infowindow = new google.maps.InfoWindow({content: "holding...."});
