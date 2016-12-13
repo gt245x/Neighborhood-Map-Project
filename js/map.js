@@ -85,39 +85,39 @@ var walmartdata = function(data) {
 
 var ViewModel = function() {
 
-    var self = this;
 
     //Create location list to be an observable array.
     this.locationList = ko.observableArray([]);
 
     atlantaLocations.forEach(function(loc, index){
-        self.locationList.push(new locations(loc, index));
-    });
+        this.locationList.push(new locations(loc, index));
+    }.bind(this));
 
     //Filter list
     this.filterTerm = ko.observable("");
 
-    self.filteredList = ko.computed(function(){
-        if (!self.filterTerm()) {
-            return self.locationList();
+    this.filteredList = ko.computed(function(){
+        if (!this.filterTerm()) {
+            return this.locationList();
         }else {
-        return ko.utils.arrayFilter(self.locationList(), function(loc){
-            return loc.name.toLowerCase().indexOf(self.filterTerm().toLowerCase()) >=0;
+        return ko.utils.arrayFilter(this.locationList(), function(loc){
+            return loc.name.toLowerCase().indexOf(this.filterTerm().toLowerCase()) >=0;
             });
         };
-    });
+    }.bind(this));
+
 
     //Filter markers (Need to figure out how to locate the markers)
-    self.filtermarkers = ko.computed(function() {
-        return ko.utils.arrayFilter(self.locationList(), function(loc){
-            if (loc.name.toLowerCase().indexOf(self.filterTerm().toLowerCase()) >= 0) {
-                console.log("test")
+    this.filtermarkers = ko.computed(function() {
+        return ko.utils.arrayFilter(this.locationList(), function(loc){
+            if (loc.name.toLowerCase().indexOf(this.filterTerm().toLowerCase()) >= 0) {
+                //console.log("test")
                 //loc.allMarkers.setVisible(false)
             }else  {
-                console.log("game")
+                //loc.allMarkers.setVisible(true)
             }
-        })
-    })
+        }.bind(this));
+    }.bind(this));
 
 
     //Function to handle when users clicks on filterd location. Data-bind on click for the filtered location
@@ -174,33 +174,33 @@ var ViewModel = function() {
     //Function to help filter out walmart locations
 
     //Filter list
-    self.filteredWarmartList = ko.computed(function(){
-        if (!self.walmartFilterTerm()) {
-            return self.walmartlist();
+    this.filteredWarmartList = ko.computed(function(){
+        if (!this.walmartFilterTerm()) {
+            return this.walmartlist();
         }else {
-        return ko.utils.arrayFilter(self.walmartlist(), function(loca){
-            return loca.name.toLowerCase().indexOf(self.walmartFilterTerm().toLowerCase()) >=0;
-            });
+        return ko.utils.arrayFilter(this.walmartlist(), function(loca){
+            return loca.name.toLowerCase().indexOf(this.walmartFilterTerm().toLowerCase()) >=0;
+            }.bind(this));
         };
-    });
+    }.bind(this));
 
 //Make zipCode to be ko.observable.
-self.zipCode = ko.observable('');
+this.zipCode = ko.observable('');
 
 //Run navigate function to get users location.
 navigate()
 
 // When submit button is clicked, run the ajax asyn
-self.getLocations =function() {
+this.getLocations =function() {
 
     //validate users zip code entry
-  if ((isValidUSZip(self.zipCode()) == false)&&(self.zipCode() != ''))
+  if ((isValidUSZip(this.zipCode()) == false)&&(this.zipCode() != ''))
          {alert("Please provide a valid US zip"); return }
 
         var walmartURL;
-        if(self.zipCode()) {
+        if(this.zipCode()) {
             walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&zip=" +
-            self.zipCode() +"&format=json"
+            this.zipCode() +"&format=json"
         } else {
             walmartURL = "http://api.walmartlabs.com/v1/stores?apiKey=k6hsrpsv49yhxwfn7x8w4pu6&lon=" +
             (userCords.longitude.toFixed(6)) + "&lat=" +
@@ -242,24 +242,24 @@ self.getLocations =function() {
                         //fill content when clicked
                         walmartMarkers.addListener('click', function(){
                         walmartcontent(this);
-                        })
+                        }.bind(this))
 
                     };
                     //console.log(walmartMarkerslist[0])
                         walmartMarkerslist.forEach(function(loc){
-                        self.walmartlist.push(new walmartdata(loc));
-                    });
+                        this.walmartlist.push(new walmartdata(loc));
+                    }.bind(this));
 
                     var bounds = new google.maps.LatLngBounds();
                     for (var i = 0; i < allWarmartlatlng.length; i++ ) {
                     bounds.extend (allWarmartlatlng[i]);
                     }
                     map.fitBounds(bounds);
-                }).fail(function(){
+                }.bind(this)).fail(function(){
                     alert('Walmart cannot provide any information at the moment')
                 });
     return false;
-    };
+    }.bind(this);
 };
 
 
