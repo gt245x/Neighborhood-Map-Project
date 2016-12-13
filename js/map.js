@@ -6,8 +6,6 @@ var pos;
 var userCords;
 var walmartMarkerslist = [];
 var allWarmartlatlng = [];
-//var filteredlocation = ko.observable("");
-//var filteredwarmarts = ko.observable("");
 var menu = ko.observable("open");
 
 //Locations that will be displayed once the index file is loaded.
