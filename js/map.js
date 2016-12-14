@@ -1,6 +1,7 @@
 var map;
 var allLatlng = [];
 var markerlist = [];
+var resultList = []
 var infowindow;
 var pos;
 var userCords;
@@ -8,53 +9,32 @@ var walmartMarkerslist = [];
 var allWarmartlatlng = [];
 var menu = ko.observable("open");
 
+
 //Locations that will be displayed once the index file is loaded.
 var atlantaLocations = [
         {
             location : {lat: 33.772620, lng : -84.385561},
-            name : "The Fox theatre",
-            desc : "A former movie palace, is a performing arts venue located in Midtown Atlanta, \
-                    Georgia and is the centerpiece of the Fox Theatre Historic District",
-            address : "600 Peachtree Street NE, Atlanta, GA 30308"
-
+            name : "The Fox theatre"
         },
         {
             location : {lat : 33.762742, lng : -84.392664},
-            name : "World of Coca-Cola",
-            desc : "The world of Coca-Cola is a museum showcasing the history of The Coca-Cola company \
-            that contains a host of entertainment areas and attractions, and is located in Atlanta, \
-            Georgia at Pemberton Place",
-            address : "121 Baker St NW, Atlanta, GA 30313"
+            name : "World of Coca-Cola"
         },
         {
             location : {lat : 33.763424, lng : -84.394891},
             name : "Georgia Aquarium",
-            desc : "The Georgia Aquarium is a public aquarium in Atlanta, Georgia. It is the largest \
-            aquarium in the Western Hemisphere, housing thousands of animals and representing several \
-            thousand species.",
-            address : "225 Baker St NW, Atlanta, GA 30313"
         },
         {
             location : {lat : 33.757168, lng : -84.396345},
             name : "Philips Arena",
-            desc : "Philips Arena is a multi-purpose indoor arena located in Atlanta, Georgia that \
-            is home to the Atlanta Hawks of the National Basketball Association and the Atlanta Dream, \
-            of the Women's National Basketball  Assocation",
-            address : "1 Philips Dr, Atlanta, GA 30303"
         },
         {
             location : {lat : 33.732162, lng : -84.371335},
             name : "Zoo Atlanta",
-            desc : "Zoo Atlanta is an Association of Zoos and Aquariums accredited zoological park \
-            in Atlanta, Georgia. The zoo is one of four zoos in the U.S currently housing giant pandas.",
-            address : "800 Cherokee Ave SE, Atlanta, GA 30315"
         },
         {
             location : {lat : 33.771510, lng : -84.389311},
             name : "The Varsity",
-            desc: "Long-running drive-in chain serving up burgers, hot dogs, fries, shakes & other \
-            American classics",
-            address : "61 North Avenue NW, Atlanta, GA 30308"
         }
 ];
 
@@ -106,11 +86,11 @@ var ViewModel = function() {
         } else {
         return ko.utils.arrayFilter(self.locationList(), function(loc){
             if (loc.name.toLowerCase().indexOf(self.filterTerm().toLowerCase()) >= 0) {
-                loc.marker.setVisible(true)
+                loc.locMarker.setVisible(true)
                 //markerlist[loc.markerindex()].setVisible(true);
                 return true;
             } else {
-                loc.marker.setVisible(false);
+                loc.locMarker.setVisible(false);
                 //markerlist[loc.markerindex()].setVisible(false)
                 return false;
             }
@@ -121,12 +101,13 @@ var ViewModel = function() {
 
     //Function to handle when users clicks on filterd location. Data-bind on click for the filtered location
     this.clickedLocation = function(loc) {
-        var selected_marker = markerlist[loc.markerindex()];
-        if (selected_marker) {
-            toggleBounce(selected_marker);
+        var selected_result = resultList[loc.markerindex()];
+        //console.log(selected_result)
+
+        if (selected_result) {
+            toggleBounce(loc.locMarker);
         }
-        fillcontent(selected_marker);
-        console.log(selected_marker)
+        fillcontent(selected_result, loc.locMarker);
 };
 
     //Function to handle when users clicks on filterd walmart location.
@@ -172,13 +153,28 @@ var ViewModel = function() {
 
     //Function to help filter out walmart locations
 
-    //Filter list
+    //Filter walmart list
     self.filteredWarmartList = ko.computed(function(){
         if (!self.walmartFilterTerm()) {
+            for (var i = 0; i < walmartMarkerslist.length; i++) {
+                walmartMarkerslist[i].setVisible(true);
+            }
             return self.walmartlist();
         }else {
-        return ko.utils.arrayFilter(self.walmartlist(), function(loca){
-            return loca.name.toLowerCase().indexOf(self.walmartFilterTerm().toLowerCase()) >=0;
+        return ko.utils.arrayFilter(self.walmartlist(), function(loc){
+            if (loc.title().toLowerCase().indexOf(self.walmartFilterTerm().toLowerCase()) >=0) {
+                for (var i = 0; i < walmartMarkerslist.length; i++) {
+                    if (loc.title() === walmartMarkerslist[i].title) {
+                        walmartMarkerslist[i].setVisible(true)
+                    }
+                    else {
+                        walmartMarkerslist[i].setVisible(false)
+                    }
+                }
+                return true;
+            }else {
+                return false;
+            }
             });
         };
     });
@@ -193,7 +189,7 @@ navigate()
 self.getLocations =function() {
 
     //validate users zip code entry
-  if ((isValidUSZip(self.zipCode()) == false)&&(self.zipCode() != ''))
+    if ((isValidUSZip(self.zipCode()) == false)&&(self.zipCode() != ''))
          {alert("Please provide a valid US zip"); return }
 
         var walmartURL;
@@ -220,7 +216,7 @@ self.getLocations =function() {
                         var lat = results.coordinates[1];
                         walmartlatlng = new google.maps.LatLng(lat, long);
 
-                        walmartMarkers = new google.maps.Marker({
+                        walmartMarker = new google.maps.Marker({
                             position : walmartlatlng,
                             map : map,
                             title: results.name,
@@ -236,10 +232,10 @@ self.getLocations =function() {
                         // put all lat and lng in an array
                         allWarmartlatlng.push(walmartlatlng);
                         // put all walmart markers into an array
-                        walmartMarkerslist.push(walmartMarkers)
+                        walmartMarkerslist.push(walmartMarker)
 
                         //fill content when clicked
-                        walmartMarkers.addListener('click', function(){
+                        walmartMarker.addListener('click', function(){
                         walmartcontent(this);
                         })
 
@@ -265,7 +261,7 @@ var vm = new ViewModel();
 ko.applyBindings(vm);
 
 
-function initialize() {
+function initMap() {
     //creates a map object and specfies the DOM element for display.
     var center = new google.maps.LatLng(33.768933,-84.420969);
     var mapOptions = {
@@ -286,41 +282,65 @@ function initialize() {
         position: google.maps.ControlPosition.RIGHT_CENTER
     },
     scaleControl: false
-};
+    };
 
-map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-infowindow = new google.maps.InfoWindow({content: "holding...."});
+    //Foursquare parameters
+    var clientID = 'KMZXUW1USBCBTCYVPYO1VFE4CNJU5TPUNBRYA4PZEFS1VZWO';
+    var clientSecret = 'B2QDZEQVYDAPWA5ZYI3GNXN15FWGTYETZWYUICLCVP5GNS1N';
 
-// for loop to loop all over the location
-for (var i = 0; i < vm.locationList().length; i++) {
-        allMarkers= new google.maps.Marker({
-        position: vm.locationList()[i].location,
-        map : map,
-        title: vm.locationList()[i].name,
-        address: vm.locationList()[i].address,
-        desc: vm.locationList()[i].desc,
-        animation: google.maps.Animation.DROP,
-    });
-    // put all lat and lng in an array
-    markerlist.push(allMarkers)
-    vm.locationList()[i].marker = allMarkers;
-    allLatlng.push(vm.locationList()[i].location);
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    infowindow = new google.maps.InfoWindow({content: "holding...."});
 
-    //fill content when clicked
-    allMarkers.addListener('click', function(){
-        fillcontent(this);
+    // for loop to loop all over the location
+    vm.locationList().forEach(function(loc){
+    //atlantaLocations.forEach(function(loc){
+    var locMarker= new google.maps.Marker({
+        position: loc.location,
+        map: map,
+        name: loc.name,
+        animation : google.maps.Animation.DROP,
     })
+    //put all marker in markerlist
+    markerlist.push(locMarker)
 
-};
+    //Assign each marker
+    loc.locMarker = locMarker;
 
-var bounds = new google.maps.LatLngBounds();
-for (var i = 0; i < allLatlng.length; i++ ) {
-    bounds.extend (allLatlng[i]);
-}
-map.fitBounds(bounds);
+    var latlng = locMarker.position.toString();
+    var lat = latlng.substring(latlng.indexOf("(")+1, latlng.lastIndexOf(","));
+    var lng = latlng.substring(latlng.indexOf(",")+2, latlng.lastIndexOf(")"));
 
+    //Url for foursquare
+    var foursquareUrl = 'https://api.foursquare.com/v2/venues/search?ll=' + lat + ',' + lng +
+                        '&client_id=' +  clientID + '&client_secret=' + clientSecret +
+                        '&v=20161212' + '&query=' + locMarker.name;
 
-};
+                    $.getJSON(foursquareUrl).done(function(data) {
+
+                        var results = data.response.venues
+                        var result = results[0]
+                        //push each result into an array
+                        resultList.push(result)
+
+                        //Toggle marker and open infowindow on click
+                        locMarker.addListener('click',function(){
+                        toggleBounce(locMarker);
+                        fillcontent(result,locMarker);
+                    })
+                        //put all lat and lng in an array
+                        allLatlng.push(locMarker.position)
+
+                        var bounds = new google.maps.LatLngBounds();
+                        for (var i = 0; i < allLatlng.length; i++ ) {
+                        bounds.extend (allLatlng[i]);
+                        }
+                        map.fitBounds(bounds);
+
+                    }).fail(function(){
+                        alert("There was an error with the API call to Foursquare. Refresh and try again.")
+                    });
+        })
+    };
 
 
 //Function to toggle each location when clicked
@@ -336,12 +356,13 @@ function toggleBounce(marker) {
   };
 
 //Function to fill the selected location marker with HTML content.
-function fillcontent(marker) {
-    var html =
-        '<div class="markerClass">' +
-        '<h1>' + marker.title + '</h1>' +
-        '<h3>' + marker.address + '</h3>' +
-        '<p>' + marker.desc + '</p>'
+function fillcontent(selected_result,marker) {
+    var html = '<div class="markerClass">' +
+                '<h1>' + selected_result.name + '</h1>' +
+                '<h3>' + selected_result.location.address + ', ' +  selected_result.location.city + ', ' +
+                selected_result.location.state + '.' + '</h3>' +
+                '<p>' + 'phoneNumber: ' + selected_result.contact.formattedPhone + '</p>' + '<br>' +
+                'url: ' + selected_result.url
         infowindow.setContent(html);
         infowindow.open(map, marker);
         }
