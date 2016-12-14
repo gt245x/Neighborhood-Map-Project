@@ -99,25 +99,24 @@ var ViewModel = function() {
 
     self.filteredList = ko.computed(function(){
         if (!self.filterTerm()) {
-            return self.locationList();
-        }else {
-        return ko.utils.arrayFilter(self.locationList(), function(loc){
-            return loc.name.toLowerCase().indexOf(self.filterTerm().toLowerCase()) >=0;
-            });
-        };
-    });
-
-    //Filter markers (Need to figure out how to locate the markers)
-    self.filtermarkers = ko.computed(function() {
+            for (var i = 0; i < markerlist.length; i++) {
+                markerlist[i].setVisible(true);
+            }
+         return self.locationList();
+        } else {
         return ko.utils.arrayFilter(self.locationList(), function(loc){
             if (loc.name.toLowerCase().indexOf(self.filterTerm().toLowerCase()) >= 0) {
-                console.log("test")
-                //loc.allMarkers.setVisible(false)
-            }else  {
-                console.log("game")
+                loc.marker.setVisible(true)
+                //markerlist[loc.markerindex()].setVisible(true);
+                return true;
+            } else {
+                loc.marker.setVisible(false);
+                //markerlist[loc.markerindex()].setVisible(false)
+                return false;
             }
-        })
-    })
+        });
+    };
+});
 
 
     //Function to handle when users clicks on filterd location. Data-bind on click for the filtered location
@@ -127,7 +126,7 @@ var ViewModel = function() {
             toggleBounce(selected_marker);
         }
         fillcontent(selected_marker);
-        console.log(loc.markerindex())
+        console.log(selected_marker)
 };
 
     //Function to handle when users clicks on filterd walmart location.
@@ -262,7 +261,8 @@ self.getLocations =function() {
     };
 };
 
-
+var vm = new ViewModel();
+ko.applyBindings(vm);
 
 
 function initialize() {
@@ -292,18 +292,19 @@ map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 infowindow = new google.maps.InfoWindow({content: "holding...."});
 
 // for loop to loop all over the location
-for (var i = 0; i < atlantaLocations.length; i++) {
+for (var i = 0; i < vm.locationList().length; i++) {
         allMarkers= new google.maps.Marker({
-        position: atlantaLocations[i].location,
+        position: vm.locationList()[i].location,
         map : map,
-        title: atlantaLocations[i].name,
-        address: atlantaLocations[i].address,
-        desc: atlantaLocations[i].desc,
+        title: vm.locationList()[i].name,
+        address: vm.locationList()[i].address,
+        desc: vm.locationList()[i].desc,
         animation: google.maps.Animation.DROP,
     });
     // put all lat and lng in an array
     markerlist.push(allMarkers)
-    allLatlng.push(atlantaLocations[i].location);
+    vm.locationList()[i].marker = allMarkers;
+    allLatlng.push(vm.locationList()[i].location);
 
     //fill content when clicked
     allMarkers.addListener('click', function(){
@@ -318,7 +319,7 @@ for (var i = 0; i < allLatlng.length; i++ ) {
 }
 map.fitBounds(bounds);
 
-ko.applyBindings(new ViewModel());
+
 };
 
 
