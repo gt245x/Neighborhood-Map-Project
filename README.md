@@ -5,8 +5,8 @@ The **neighborhood map** is a project for Udacity Fullstack program. This projec
 
 #Installation:
 
-    - Fork the files from github or copy into your directory.
-    - Run the *index.html* file using local host or by opening it using any browser
+    -Fork the files from github or copy into your directory.
+    -Run the *index.html* file using local host or by opening it using any browser
 
 #Map Features
 
@@ -16,15 +16,14 @@ The **neighborhood map** is a project for Udacity Fullstack program. This projec
 - The map displays Walmart locations in the US based on the users zip code or current location. 
 - Walmart API is also used to provide markers about walmart locations.
 
-#Credit:
+#Third Party Attribution:
 
-Special thanks:
--Paul Dessert for the youTube video Google maps api tutorial on finding local farmers market.
--Walmart API
--Four square API
--knockout.js
--jQuery
--google map API
+- Paul Dessert for the youTube video Google maps api tutorial on finding local farmers market.
+- Walmart API
+- Four square API
+- knockout.js
+- jQuery
+- google map API
 
 
 
