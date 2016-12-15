@@ -1,13 +1,30 @@
-Neighborhood Map
+#Neighborhood Map
 
-This is a project for Udacity Fullstack program. This project displays a map of my neigborhood and also can asynchronously obtain walmart locations in US using users location or zip code . The locations and walmart locations on the map can also be individually filtered.
+The **neighborhood map** is a project for Udacity Fullstack program. This project displays a map of my neigborhood and the user can asynchronously obtain info about the locations from foursquare. The user can also obtain walmart locations in US using users location or zip code . The locations and walmart locations on the map can also be individually filtered.
 
 
-Installation:
+#Installation:
 
-	Run the index.html file using local host or by opening using any browser.
+    - Fork the files from github or copy into your directory.
+    - Run the *index.html* file using local host or by opening it using any browser
 
-Credit:
-	Special thanks to Paul Dessert for the youTube video Google maps api tutorial on finding local farmers market. The 4 part video tutorial provided guidance in implementing my own code.
+#Map Features
+
+- The map displays map markers for 6 different locations within the neighborhood once it's loaded.
+- The map has a filter option that uses an inout field field to filter the list view and map markers.
+- Foursquare API is used to provide when a map marker or list view entry is clicked.
+- The map displays Walmart locations in the US based on the users zip code or current location. 
+- Walmart API is also used to provide markers about walmart locations.
+
+#Credit:
+
+Special thanks:
+-Paul Dessert for the youTube video Google maps api tutorial on finding local farmers market.
+-Walmart API
+-Four square API
+-knockout.js
+-jQuery
+-google map API
+
 
 
