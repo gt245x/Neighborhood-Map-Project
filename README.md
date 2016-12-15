@@ -11,14 +11,14 @@ The **neighborhood map** is a project for Udacity Fullstack program. This projec
 #Map Features
 
 - The map displays map markers for 6 different locations within the neighborhood once it's loaded.
-- The map has a filter option that uses an inout field field to filter the list view and map markers.
-- Foursquare API is used to provide when a map marker or list view entry is clicked.
+- The map has a filter option that uses an input field to filter the list views and map markers.
+- Foursquare API is used to provide information when a map marker or list view entry is clicked.
 - The map displays Walmart locations in the US based on the users zip code or current location. 
-- Walmart API is also used to provide markers about walmart locations.
+- Walmart API is used to provide markers about walmart locations.
 
 #Third Party Attribution:
 
-- Paul Dessert for the youTube video Google maps api tutorial on finding local farmers market.
+- Paul Dessert for the youTube video API tutorial on finding local farmers market.
 - Walmart API
 - Four square API
 - knockout.js
