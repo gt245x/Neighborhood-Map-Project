@@ -362,8 +362,8 @@ function toggleBounce(marker) {
 function fillcontent(selected_result,marker) {
     var address, city, state, phone, url;
     !!selected_result.location.address ? address = selected_result.location.address : address = "No address available";
-    !!selected_result.location.city ? city = selected_result.location.city : city = "city not available";
-    !!selected_result.location.state ? state = selected_result.location.state : city = "state is not available";
+    !!selected_result.location.city ? city = selected_result.location.city : city = "City is not available";
+    !!selected_result.location.state ? state = selected_result.location.state : city = "State is not available";
     !!selected_result.contact.formattedPhone ? phone = selected_result.contact.formattedPhone : phone = "No phone number provided";
     !!selected_result.url ? url = selected_result.url : city = "No url provided";
 
