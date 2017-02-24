@@ -1,6 +1,6 @@
 #Neighborhood Map
 
-The **neighborhood map** is a project for Udacity Fullstack program. This project displays a map of my neigborhood and the user can asynchronously obtain info about the locations from foursquare. The user can also obtain walmart locations in US using users location or zip code . The locations and walmart locations on the map can also be individually filtered.
+The **neighborhood map** is a Javascript project using knockouJS. This project displays a map of my neigborhood and the user can asynchronously obtain info about the locations from foursquare. The user can also obtain walmart locations in US using users location or zip code . The locations and walmart locations on the map can also be individually filtered.
 
 
 #Installation:
